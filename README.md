@@ -18,6 +18,27 @@ The primary use case is:
   access for a few hours at which point her access should automatically
   be revoked.
 
+Quick start
+===========
+
+Generate a certificate authority (yep, this is exactly like making an ordinary private key):
+
+`ssh-keygen -f ~/.ssh/ssh_ca_production -b 4096`
+
+Put the CA's public key on the remote host of your choosing into authorized_keys, but prefix it with cert-authority:
+
+`echo "cert-authority $(cat ssh_ca_production.pub)" >> ~/.ssh/authorized_keys`
+
+Generate a certificate using the utility in this github repo:
+
+`sign_key -e production -u user@example.com -p ~/.ssh/id_rsa.pub -t +1d`
+
+Install the certificate using the other utility in this github repo:
+
+`get_key '<output from sign_key command>'`
+
+SSH like normal.
+
 Usage
 =====
 
@@ -62,7 +83,7 @@ authorized_keys file of machines we want to login to. However, unlike
 normal, the line in authorized_keys is prefixed with `cert-authority`.
 
 ```
-echo "cert-authority $(cat user-ca-key.pub)" >> ~/.ssh/authorized_keys
+echo "cert-authority $(cat ssh_ca_production.pub)" >> ~/.ssh/authorized_keys
 ```
 
 At this point the server is ready to accept authentication using any
@@ -87,6 +108,19 @@ get_key 'https://my-s3-bucket.s3-us-west-1.amazonaws.com/certs/user%40example.co
 
 The user can now log into the remote system using these new keys.
 
+`get_key` is nothing particularly fancy. It simply downloads the certificate and attempts to find the corresponding private key for the user and places the cert next to it. OpenSSH requires that the cert be named similarly to the private key. For example, if your private key is named `id_rsa` the cert must be in a file named `id_rsa-cert.pub`. It really does simply append `-cert.pub` to the filename.
+
+Troubleshooting
+===============
+
+Typical problems include not having the certificate added to the running ssh-agent. You can list certificates and keys with the ssh-add command: `ssh-add -l`. You should see the certificate listed:
+
+```
+2048 66:b5:be:e5:7e:09:3f:98:97:36:9b:64:ec:ea:3a:fe .ssh/id_rsa (RSA)
+2048 66:b5:be:e5:7e:09:3f:98:97:36:9b:64:ec:ea:3a:fe .ssh/id_rsa (RSA-CERT)
+```
+If you don't see it listed simply run `ssh-add <path to private key>` again.
+
 Incompatibilities
 =================
 
@@ -97,4 +131,9 @@ When a user has one of these cert keys in their keychain
 This is due to an incompatibility in the Ruby net-ssh package included in
 vagrant. This is being tracked in this
 [net-ssh issue](https://github.com/net-ssh/net-ssh/pull/142).
+
+OS X
+----
+OS X's magic ssh-add (the one where it prompts you in the GUI of OS X for your passphrase) does not properly add the certificate. In order to utilize certificates you'll want to `ssh-add .ssh/my_private_key` at a terminal in order for the certificate to properly be added to your ssh-agent.
+
 
