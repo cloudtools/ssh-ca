@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+include .gitignore
+include ssh_ca_example.conf
