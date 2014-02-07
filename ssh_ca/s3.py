@@ -41,11 +41,21 @@ class S3Authority(ssh_ca.Authority):
         )
         return new_serial
 
-    def get_public_key(self, username):
-        key = self.ssh_bucket.get_key('keys/%s' % (username,))
-        if key is None:
+    def get_public_key(self, username, environment):
+        key_names_to_try = [
+            'keys/{username}?environment={environment}',
+            'keys/{username}'
+        ]
+        for key_name_template in key_names_to_try:
+            key_name = key_name_template.format(
+                username=username,
+                environment=environment,
+            )
+            key = self.ssh_bucket.get_key(key_name)
+            if key is not None:
+                return key.get_contents_as_string()
+        else:
             return None
-        return key.get_contents_as_string()
 
     def upload_public_key(self, username, key_file):
         k = self.ssh_bucket.new_key('keys/%s' % (username,))
