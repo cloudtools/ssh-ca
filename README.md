@@ -25,7 +25,8 @@ Generate a certificate authority (yep, this is exactly like making an ordinary p
 
 `ssh-keygen -f ~/.ssh/ssh_ca_production -b 4096`
 
-Put the CA's public key on the remote host of your choosing into authorized_keys, but prefix it with cert-authority:
+Put the CA's public key on the remote host of your choosing into
+`authorized_keys`, but prefix it with cert-authority:
 
 `echo "cert-authority $(cat ssh_ca_production.pub)" >> ~/.ssh/authorized_keys`
 
@@ -108,12 +109,19 @@ get_key 'https://my-s3-bucket.s3-us-west-1.amazonaws.com/certs/user%40example.co
 
 The user can now log into the remote system using these new keys.
 
-`get_key` is nothing particularly fancy. It simply downloads the certificate and attempts to find the corresponding private key for the user and places the cert next to it. OpenSSH requires that the cert be named similarly to the private key. For example, if your private key is named `id_rsa` the cert must be in a file named `id_rsa-cert.pub`. It really does simply append `-cert.pub` to the filename.
+`get_key` is nothing particularly fancy. It simply downloads the
+certificate and attempts to find the corresponding private key for the
+user and places the cert next to it. OpenSSH requires that the cert be
+named similarly to the private key. For example, if your private key is
+named `id_rsa` the cert must be in a file named `id_rsa-cert.pub`. It
+really does simply append `-cert.pub` to the filename.
 
 Troubleshooting
 ===============
 
-Typical problems include not having the certificate added to the running ssh-agent. You can list certificates and keys with the ssh-add command: `ssh-add -l`. You should see the certificate listed:
+Typical problems include not having the certificate added to the running
+ssh-agent. You can list certificates and keys with the ssh-add command:
+`ssh-add -l`. You should see the certificate listed:
 
 ```
 2048 66:b5:be:e5:7e:09:3f:98:97:36:9b:64:ec:ea:3a:fe .ssh/id_rsa (RSA)
@@ -121,8 +129,31 @@ Typical problems include not having the certificate added to the running ssh-age
 ```
 If you don't see it listed simply run `ssh-add <path to private key>` again.
 
-Incompatibilities
-=================
+Incompatibilities and Annoyances
+================================
+
+OpenSSH - One cert per key
+--------------------------
+You can only have one SSH cert loaded per private key at any one time
+(The SSH agent works by loading your private key file `keyfile` and then
+looks for a certificate in a file named `keyfile`-cert.pub.
+
+If, like us, you have multiple environments that you want to access in a
+short time window the best workaround is to have multiple private keys.
+This project has builtin support for per-environment keys. To take
+advantage of this upload your private key, using the sign_key command,
+but specifying your username in the format
+`user?environment=THE-ENVIRONMENT`. For example, I might use
+`bob@veznat.com?environment=stage` for staging and
+`bob@veznat.com?environment=prod` for production. The public keys that
+are being uploaded her must correspond to separate private keys
+otherwise when get_cert runs it will not be able to reliably figure out
+where to put the downloaded cert.
+
+If you use this multiple environment naming trick in your username you
+do not need to specify anything special when running sign_key in the
+future. Sign key searches for your public key first by doing an
+environment specific lookup and second looking for a generic one.
 
 Vagrant
 -------
@@ -134,6 +165,10 @@ vagrant. This is being tracked in this
 
 OS X
 ----
-OS X's magic ssh-add (the one where it prompts you in the GUI of OS X for your passphrase) does not properly add the certificate. In order to utilize certificates you'll want to `ssh-add .ssh/my_private_key` at a terminal in order for the certificate to properly be added to your ssh-agent.
+OS X's magic ssh-add (the one where it prompts you in the GUI of OS X
+for your passphrase) does not properly add the certificate. In order to
+utilize certificates you'll want to `ssh-add .ssh/my_private_key` at a
+terminal in order for the certificate to properly be added to your
+ssh-agent.
 
 

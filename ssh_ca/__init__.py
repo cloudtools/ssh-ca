@@ -28,7 +28,7 @@ class Authority(object):
     def __init__(self, ca_key):
         self.ca_key = ca_key
 
-    def get_public_key(self, username):
+    def get_public_key(self, username, environment):
         pass
 
     def increment_serial_number(self):

@@ -61,7 +61,7 @@ if __name__ == '__main__':
     authority = args.authority
     expires_in = args.expires_in
     public_path = args.public_path
-    section = args.environment
+    environment = args.environment
     upload_only = args.upload
     username = args.username
 
@@ -73,11 +73,11 @@ if __name__ == '__main__':
         config.read(args.config_file)
 
     # Get a valid CA key file
-    ca_key = ssh_ca.get_config_value(config, section, 'private_key')
+    ca_key = ssh_ca.get_config_value(config, environment, 'private_key')
     if ca_key:
         ca_key = os.path.expanduser(ca_key)
     else:
-        ca_key = os.path.expanduser('~/.ssh/ssh_ca_%s' % (section,))
+        ca_key = os.path.expanduser('~/.ssh/ssh_ca_%s' % (environment,))
     if not os.path.isfile(ca_key):
         print "CA key file %s does not exist." % (ca_key,)
         sys.exit(1)
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         ca.upload_public_key(username, public_path)
         delete_public_key = False
     else:
-        public_key_contents = ca.get_public_key(username)
+        public_key_contents = ca.get_public_key(username, environment)
         if public_key_contents is None:
             print"Key for user %s not found." % (username)
             sys.exit(1)
