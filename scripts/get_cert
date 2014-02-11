@@ -48,6 +48,10 @@ def move_cert_into_place(cert_path, private_key_filename):
     os.rename(cert_path, new_cert_filename)
 
 
+def re_add_identity(private_key_filename):
+    proc = subprocess.check_output(['/usr/bin/ssh-add', private_key_filename])
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print 'Usage: %s <URL to cert>' % (sys.argv[0],)
@@ -61,3 +65,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     move_cert_into_place(cert_filename, private_key_filename)
+    re_add_identity(private_key_filename)
+
