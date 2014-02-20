@@ -70,7 +70,8 @@ class S3Authority(ssh_ca.Authority):
         )
         return k.generate_url(7200)
 
-    def make_audit_log(self, serial, valid_for, username, ca_key_filename):
+    def make_audit_log(self,
+            serial, valid_for, username, ca_key_filename, reason):
         timestamp = datetime.datetime.strftime(
             datetime.datetime.utcnow(), '%Y-%m-%d-%H:%M:%S.%f')
         k = self.ssh_bucket.new_key('audit_log/%d.json' % (serial,))
@@ -81,5 +82,6 @@ class S3Authority(ssh_ca.Authority):
             'timestamp': timestamp,
             'access_key': self.s3_conn.access_key,
             'ca_key_filename': ca_key_filename,
+            'reason': reason,
         }
         k.set_contents_from_string(json.dumps(audit_info))

@@ -36,12 +36,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument('-a', '--authority', dest='authority',
-                        default=default_authority, help="Pick one: s3")
+                        default=default_authority, help='Pick one: s3')
     parser.add_argument('-c', '--config', dest='config_file',
                         default=default_config,
-                        help="The configuration file to use.  Can also be "
-                             "specified in the SSH_CA_CONFIG environment "
-                             "variable.  Default: %(default)s")
+                        help='The configuration file to use.  Can also be '
+                             'specified in the SSH_CA_CONFIG environment '
+                             'variable.  Default: %(default)s')
     parser.add_argument('-e', '--environment', required=True,
                         help='Environment name')
     parser.add_argument(
@@ -52,20 +52,19 @@ if __name__ == '__main__':
         '-u', help='username / email address', required=True, dest='username')
     parser.add_argument(
         '--upload', help='Only upload the public key',
-        dest='upload', action='store_true')
+        dest='upload_only', action='store_true')
+    parser.add_argument('-r', '--reason',
+        help='Specify the reason for the user needing this cert.')
     parser.add_argument('-t', '--expires-in', default='+2h',
-        help="Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. "
-             "Default: %(default)s")
+        help='Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. '
+             'Default: %(default)s')
     args = parser.parse_args()
 
-    authority = args.authority
-    expires_in = args.expires_in
     public_path = args.public_path
     environment = args.environment
-    upload_only = args.upload
     username = args.username
 
-    ssh_ca_section = "ssh-ca-" + authority
+    ssh_ca_section = 'ssh-ca-' + args.authority
 
     config = None
     if args.config_file:
@@ -79,22 +78,22 @@ if __name__ == '__main__':
     else:
         ca_key = os.path.expanduser('~/.ssh/ssh_ca_%s' % (environment,))
     if not os.path.isfile(ca_key):
-        print "CA key file %s does not exist." % (ca_key,)
+        print 'CA key file %s does not exist.' % (ca_key,)
         sys.exit(1)
 
     try:
         # Create our CA
         ca = ssh_ca.s3.S3Authority(config, ssh_ca_section, ca_key)
     except ssh_ca.SSHCAInvalidConfiguration, e:
-        print "Issue with creating CA: %s" % e.message
+        print 'Issue with creating CA: %s' % e.message
         sys.exit(1)
 
-    if upload_only:
+    if args.upload_only:
         if not public_path:
-            print "Upload needs a public key specified."
+            print 'Upload needs a public key specified.'
             sys.exit(1)
         ca.upload_public_key(username, public_path)
-        print "Public key %s for username %s uploaded." % (public_path,
+        print 'Public key %s for username %s uploaded.' % (public_path,
                                                            username)
         sys.exit(0)
 
@@ -105,15 +104,25 @@ if __name__ == '__main__':
     else:
         public_key_contents = ca.get_public_key(username, environment)
         if public_key_contents is None:
-            print"Key for user %s not found." % (username)
+            print 'Key for user %s not found.' % (username)
             sys.exit(1)
         (fd, public_path) = tempfile.mkstemp()
         with closing(os.fdopen(fd, 'w')) as f:
             f.write(public_key_contents)
         delete_public_key = True
 
+    if args.reason:
+        reason = args.reason
+    else:
+        print 'Specify the reason for the user needing this cert'
+        reason = raw_input().strip()
+        if len(reason) > 256:
+            print 'Reason is way too long. Type less.'
+            sys.exit(1)
+
     # Sign the key
-    cert_contents = ca.sign_public_key(public_path, username, expires_in)
+    cert_contents = ca.sign_public_key(
+        public_path, username, args.expires_in, reason)
 
     print
     print 'Public key signed, certificate available for download here:'

@@ -34,13 +34,15 @@ class Authority(object):
     def increment_serial_number(self):
         pass
 
-    def make_audit_log(self, serial, valid_for, username, ca_key_filename):
+    def make_audit_log(self,
+            serial, valid_for, username, ca_key_filename, reason):
         pass
 
     def upload_public_key(self, username, public_path):
         pass
 
-    def sign_public_key(self, public_key_filename, username, expires_in):
+    def sign_public_key(self,
+            public_key_filename, username, expires_in, reason):
         serial = self.increment_serial_number()
 
         subprocess.check_output([
@@ -52,7 +54,7 @@ class Authority(object):
             '-n', 'ubuntu,ec2-user',
             public_key_filename])
 
-        self.make_audit_log(serial, expires_in, username, self.ca_key)
+        self.make_audit_log(serial, expires_in, username, self.ca_key, reason)
 
         if public_key_filename.endswith('.pub'):
             public_key_filename = public_key_filename[:-4]
