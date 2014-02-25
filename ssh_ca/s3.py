@@ -1,7 +1,6 @@
 import boto.s3
 import datetime
 import json
-import sys
 
 from boto.exception import S3ResponseError
 
@@ -70,8 +69,8 @@ class S3Authority(ssh_ca.Authority):
         )
         return k.generate_url(7200)
 
-    def make_audit_log(self,
-            serial, valid_for, username, ca_key_filename, reason):
+    def make_audit_log(
+            self, serial, valid_for, username, ca_key_filename, reason):
         timestamp = datetime.datetime.strftime(
             datetime.datetime.utcnow(), '%Y-%m-%d-%H:%M:%S.%f')
         k = self.ssh_bucket.new_key('audit_log/%d.json' % (serial,))

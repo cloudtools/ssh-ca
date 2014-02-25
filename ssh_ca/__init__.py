@@ -3,6 +3,9 @@ import os
 import subprocess
 
 
+__version__ = "0.1.0"
+
+
 class SSHCAException(Exception):
     pass
 
@@ -34,15 +37,15 @@ class Authority(object):
     def increment_serial_number(self):
         pass
 
-    def make_audit_log(self,
-            serial, valid_for, username, ca_key_filename, reason):
+    def make_audit_log(
+            self, serial, valid_for, username, ca_key_filename, reason):
         pass
 
     def upload_public_key(self, username, public_path):
         pass
 
-    def sign_public_key(self,
-            public_key_filename, username, expires_in, reason):
+    def sign_public_key(
+            self, public_key_filename, username, expires_in, reason):
         serial = self.increment_serial_number()
 
         subprocess.check_output([
