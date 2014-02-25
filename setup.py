@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='ssh-ca',
-    version='0.1.0',
+    version='0.2.0',
     description="SSH CA utilities",
     author="Bob Van Zant",
     author_email="bob@veznat.com",
