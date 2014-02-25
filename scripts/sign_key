@@ -114,8 +114,8 @@ if __name__ == '__main__':
     if args.reason:
         reason = args.reason
     else:
-        print 'Specify the reason for the user needing this cert'
-        reason = raw_input().strip()
+        prompt = 'Specify the reason for the user needing this cert:\n'
+        reason = raw_input(prompt).strip()
         if len(reason) > 256:
             print 'Reason is way too long. Type less.'
             sys.exit(1)
