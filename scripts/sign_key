@@ -36,14 +36,16 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument('-a', '--authority', dest='authority',
-                        default=default_authority, help='Pick one: s3')
+        default=default_authority, help='Pick one: s3')
     parser.add_argument('-c', '--config', dest='config_file',
-                        default=default_config,
-                        help='The configuration file to use.  Can also be '
-                             'specified in the SSH_CA_CONFIG environment '
-                             'variable.  Default: %(default)s')
+        default=default_config,
+        help='The configuration file to use.  Can also be '
+             'specified in the SSH_CA_CONFIG environment '
+             'variable.  Default: %(default)s')
     parser.add_argument('-e', '--environment', required=True,
-                        help='Environment name')
+        help='Environment name')
+    parser.add_argument('--principal', action='append',
+        help='A principal (username) that the user is allowed to use',)
     parser.add_argument(
         '-p', help='Path to public key. If set we try to upload this. '
         'Otherwise we try to download one.',
@@ -120,9 +122,14 @@ if __name__ == '__main__':
             print 'Reason is way too long. Type less.'
             sys.exit(1)
 
+    if args.principal:
+        principal = args.principal
+    else:
+        principal = ['ec2-user', 'ubuntu']
+
     # Sign the key
-    cert_contents = ca.sign_public_key(
-        public_path, username, args.expires_in, reason)
+    cert_contents = ca.sign_public_user_key(
+        public_path, username, args.expires_in, reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'
