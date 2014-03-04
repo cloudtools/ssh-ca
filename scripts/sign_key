@@ -35,31 +35,45 @@ if __name__ == '__main__':
         os.getenv('SSH_CA_CONFIG', '~/.ssh_ca/config'))
 
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument('-a', '--authority', dest='authority',
-        default=default_authority, help='Pick one: s3')
-    parser.add_argument('-c', '--config', dest='config_file',
+    parser.add_argument('-a', '--authority',
+        dest='authority', default=default_authority,
+        help='Pick one: s3',
+    )
+    parser.add_argument('-c', '--config-file',
         default=default_config,
         help='The configuration file to use.  Can also be '
              'specified in the SSH_CA_CONFIG environment '
-             'variable.  Default: %(default)s')
-    parser.add_argument('-e', '--environment', required=True,
-        help='Environment name')
-    parser.add_argument('--principal', action='append',
-        help='A principal (username) that the user is allowed to use',)
-    parser.add_argument(
-        '-p', help='Path to public key. If set we try to upload this. '
-        'Otherwise we try to download one.',
-        dest='public_path')
-    parser.add_argument(
-        '-u', help='username / email address', required=True, dest='username')
-    parser.add_argument(
-        '--upload', help='Only upload the public key',
-        dest='upload_only', action='store_true')
+             'variable.  Default: %(default)s',
+    )
+    parser.add_argument('-e', '--environment',
+        required=True,
+        help='Environment name',
+    )
+    parser.add_argument('--principal',
+        action='append',
+        help='A principal (username) that the user is allowed to use',
+    )
+    parser.add_argument('-p',
+        dest='public_path',
+        help='Path to public key. If set we try to upload this. '
+             'Otherwise we try to download one.',
+    )
+    parser.add_argument('-u',
+        required=True, dest='username',
+        help='username / email address',
+    )
+    parser.add_argument('--upload',
+        dest='upload_only', action='store_true',
+        help='Only upload the public key',
+    )
     parser.add_argument('-r', '--reason',
-        help='Specify the reason for the user needing this cert.')
-    parser.add_argument('-t', '--expires-in', default='+2h',
+        help='Specify the reason for the user needing this cert.',
+    )
+    parser.add_argument('-t', '--expires-in',
+        default='+2h',
         help='Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. '
-             'Default: %(default)s')
+             'Default: %(default)s',
+    )
     args = parser.parse_args()
 
     public_path = args.public_path
