@@ -18,8 +18,21 @@ The primary use case is:
   access for a few hours at which point her access should automatically
   be revoked.
 
+A second use case is around host keys:
+
+  A server is launched into the cloud by an adminstrator and made
+  available to other users over SSH. The first time a user connects to
+  that machine she is prompted to inspect the host key fingerprint and
+  type either "yes" or "no". Most users blindly type yes. By signing a
+  host key and generating a certificate users can blindly accept any
+  server that presents a valid certificate as trustworthy and never be
+  prompted to blindly type "yes" again.
+
 Quick start
 ===========
+
+User keys
+---------
 
 Generate a certificate authority (yep, this is exactly like making an ordinary private key):
 
@@ -39,6 +52,32 @@ Install the certificate using the other utility in this github repo:
 `get_key '<output from sign_key command>'`
 
 SSH like normal.
+
+Host keys
+---------
+
+First create a CA using ssh-keygen as described in the previous section.
+Then use the `sign_host_key` script included in this distribution.
+
+This script will SSH out to the remote server and:
+
+  - Copy back the host's public key
+  - Sign it (it will ask you for the passphrase to your CA
+  - Copy it back to the host
+  - Restart sshd
+
+Once the cert is in place you need to have your client computers told to
+trust the CA. Take the public portion of your CA and add it into your
+`authorized_keys` file according to this format:
+
+  `@cert-authority *.domain ssh-rsa ...`
+
+The `*.domain` is intended to be the domain you're signing keys for. If
+you were working with a CA that only signed host keys for veznat.com you
+could enter `*.veznat.com`. If you sign keys for all sorts of domains
+you can enter a `*` here without any qualification, however, you should
+understand what this means in the context of a compromised CA before
+doing so.
 
 Usage
 =====

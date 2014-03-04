@@ -69,19 +69,34 @@ class S3Authority(ssh_ca.Authority):
         )
         return k.generate_url(7200)
 
+    def make_host_audit_log(self,
+            serial, valid_for, ca_key_filename, reason, hostnames):
+        audit_info = {
+            'valid_for': valid_for,
+            'access_key': self.s3_conn.access_key,
+            'ca_key_filename': ca_key_filename,
+            'reason': reason,
+            'hostnames': hostnames,
+        }
+        return self.drop_audit_blob(serial, audit_info)
+
     def make_audit_log(self,
             serial, valid_for, username, ca_key_filename, reason, principals):
-        timestamp = datetime.datetime.strftime(
-            datetime.datetime.utcnow(), '%Y-%m-%d-%H:%M:%S.%f')
-        k = self.ssh_bucket.new_key('audit_log/%d.json' % (serial,))
-
         audit_info = {
             'username': username,
             'valid_for': valid_for,
-            'timestamp': timestamp,
             'access_key': self.s3_conn.access_key,
             'ca_key_filename': ca_key_filename,
             'reason': reason,
             'principals': principals,
         }
-        k.set_contents_from_string(json.dumps(audit_info))
+        return self.drop_audit_blob(serial, audit_info)
+
+    def drop_audit_blob(self, serial, blob):
+        k = self.ssh_bucket.new_key('audit_log/%d.json' % (serial,))
+
+        timestamp = datetime.datetime.strftime(
+            datetime.datetime.utcnow(), '%Y-%m-%d-%H:%M:%S.%f')
+        blob['timestamp'] = timestamp
+
+        k.set_contents_from_string(json.dumps(blob))
