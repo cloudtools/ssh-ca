@@ -38,12 +38,12 @@ class Authority(object):
     def increment_serial_number(self):
         pass
 
-    def make_audit_log(self,
-            serial, valid_for, username, ca_key_filename, reason, principals):
+    def make_audit_log(self, serial, valid_for, username,
+                       ca_key_filename, reason, principals):
         pass
 
-    def make_host_audit_log(self,
-            serial, valid_for, ca_key_filename, reason, hostnames):
+    def make_host_audit_log(self, serial, valid_for, ca_key_filename,
+                            reason, hostnames):
         pass
 
     def upload_public_key(self, username, public_path):
@@ -78,8 +78,8 @@ class Authority(object):
             'sudo service sshd restart'
         ])
 
-    def sign_public_host_key(self,
-            public_key_filename, expires_in, hostnames, reason, key_id):
+    def sign_public_host_key(self, public_key_filename, expires_in,
+                             hostnames, reason, key_id):
         serial = self.increment_serial_number()
 
         subprocess.check_output([
@@ -97,8 +97,8 @@ class Authority(object):
 
         return self.get_cert_contents(public_key_filename)
 
-    def sign_public_user_key(self,
-            public_key_filename, username, expires_in, reason, principals):
+    def sign_public_user_key(self, public_key_filename, username,
+                             expires_in, reason, principals):
         serial = self.increment_serial_number()
 
         subprocess.check_output([

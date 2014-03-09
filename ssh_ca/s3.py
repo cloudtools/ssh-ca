@@ -69,8 +69,8 @@ class S3Authority(ssh_ca.Authority):
         )
         return k.generate_url(7200)
 
-    def make_host_audit_log(self,
-            serial, valid_for, ca_key_filename, reason, hostnames):
+    def make_host_audit_log(self, serial, valid_for, ca_key_filename,
+                            reason, hostnames):
         audit_info = {
             'valid_for': valid_for,
             'access_key': self.s3_conn.access_key,
@@ -80,8 +80,8 @@ class S3Authority(ssh_ca.Authority):
         }
         return self.drop_audit_blob(serial, audit_info)
 
-    def make_audit_log(self,
-            serial, valid_for, username, ca_key_filename, reason, principals):
+    def make_audit_log(self, serial, valid_for, username,
+                       ca_key_filename, reason, principals):
         audit_info = {
             'username': username,
             'valid_for': valid_for,
