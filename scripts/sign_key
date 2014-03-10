@@ -27,6 +27,13 @@ from contextlib import closing
 
 import ssh_ca
 import ssh_ca.s3
+import ssh_ca.sqlite
+
+
+ca_map = {
+    's3': ssh_ca.s3.S3Authority,
+    'sqlite': ssh_ca.sqlite.SqliteAuthority,
+}
 
 
 if __name__ == '__main__':
@@ -37,7 +44,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument('-a', '--authority',
         dest='authority', default=default_authority,
-        help='Pick one: s3',
+        choices=['s3', 'sqlite'], 
+        help='Specify CA backing store type',
     )
     parser.add_argument('-c', '--config-file',
         default=default_config,
@@ -99,7 +107,7 @@ if __name__ == '__main__':
 
     try:
         # Create our CA
-        ca = ssh_ca.s3.S3Authority(config, ssh_ca_section, ca_key)
+        ca = ca_map[args.authority](config, ssh_ca_section, ca_key)
     except ssh_ca.SSHCAInvalidConfiguration, e:
         print 'Issue with creating CA: %s' % e.message
         sys.exit(1)
