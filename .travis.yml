@@ -1,0 +1,16 @@
+language: python
+python:
+  - "2.7"
+  - "3.3"
+
+install:
+  - pip install --use-mirrors pep8 pyflakes
+
+before_script:
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then 2to3 -n -w --no-diffs ssh_ca; fi
+  - pep8 --version
+  - pep8 .
+  - pyflakes .
+
+script:
+  - python setup.py test
