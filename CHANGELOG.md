@@ -1,3 +1,8 @@
+## 0.3.0 (2014-04-07)
+- Support specifying the principals in use
+- Add functionality for signing host keys
+- Add testing via travis-ci
+
 ## 0.2.0 (2014-02-25)
 - Add environment-specific public keys
 - Run ssh-add as part of get cert so openssh will detect the new cert
