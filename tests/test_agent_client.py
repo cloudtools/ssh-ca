@@ -24,7 +24,8 @@ class TestAgentSocketValidation(unittest.TestCase):
                 agent_client.Client,
             )
         finally:
-            os.environ['SSH_AUTH_SOCK'] = old_env
+            if old_env is not None:
+                os.environ['SSH_AUTH_SOCK'] = old_env
 
 
 class TestAgentBuffer(unittest.TestCase):
