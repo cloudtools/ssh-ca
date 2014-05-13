@@ -34,12 +34,24 @@ class SshAgentBuffer(object):
 class Client(object):
     def __init__(self, ssh_agent_sock_path=None):
         self.connection = None
+
         self.ssh_agent_sock_path = ssh_agent_sock_path
+        if self.ssh_agent_sock_path is None:
+            self.ssh_agent_sock_path = os.getenv('SSH_AUTH_SOCK')
+        self.validate_socket_path(self.ssh_agent_sock_path)
+
+    def validate_socket_path(self, socket_path):
+        if not self.ssh_agent_sock_path:
+            raise SshClientFailure(
+                'SSH agent path not set in $SSH_AUTH_SOCK. Is it running?')
+
+        if not os.path.exists(self.ssh_agent_sock_path):
+            raise SshClientFailure(
+                "$SSH_AUTH_SOCK set to '%s' but doesn't exist?" % (
+                    self.ssh_agent_sock_path,))
 
     def connect(self):
         self.connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        if self.ssh_agent_sock_path is None:
-            self.ssh_agent_sock_path = os.getenv('SSH_AUTH_SOCK')
         self.connection.connect(self.ssh_agent_sock_path)
 
     def _send_msg(self, msg):
@@ -69,5 +81,5 @@ class Client(object):
         remove_msg.append_byte(SSH_AGENTC_REMOVE_RSA_IDENTITY)
         remove_msg.append_string(base64.b64decode(pubkey))
         self._send_msg(remove_msg.serialize())
-        if SSH_AGENT_SUCCESS != self._recv_response_code():
+        if self._recv_response_code() != SSH_AGENT_SUCCESS:
             raise SshClientFailure('Unable to remove key.')

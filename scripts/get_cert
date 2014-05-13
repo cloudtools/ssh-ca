@@ -71,7 +71,11 @@ def re_add_identity(private_key_filename, valid_for_seconds):
     public_filename = private_key_filename + '.pub'
     if os.path.exists(public_filename):
         agent_client = ssh_ca.agent_client.Client()
-        agent_client.connect()
+        try:
+            agent_client.connect()
+        except ssh_ca.agent_client.SshClientFailure, e:
+            print "Unable to find SSH agent, things probably aren't working."
+
         with open(public_filename, 'r') as f:
             pub_key = f.read().strip().split()[1]
         try:
