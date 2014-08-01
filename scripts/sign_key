@@ -27,6 +27,7 @@ from contextlib import closing
 
 import ssh_ca
 import ssh_ca.s3
+from ssh_ca.utils import (parse_time, epoch2timefmt)
 
 
 if __name__ == '__main__':
@@ -80,18 +81,25 @@ if __name__ == '__main__':
                 'A relative time like +1h. Or YYYYMMDDHHMMSS. '
                 'Default: %(default)s',
     )
-    parser.add_argument('-x', '--url-expires',
-            default=7200,
-            type=int,
-            help='Certficate URL expires in. '
-                'Number of seconds.  Default: %(default)s',
-    )
-
     args = parser.parse_args()
 
     public_path = args.public_path
     environment = args.environment
     username = args.username
+
+    starts_in = parse_time(args.starts_in)
+    expires_in = parse_time(args.expires_in)
+    if starts_in >= expires_in:
+        sys.stderr.write("You must specify an --expires-in later then the --starts-in\n")
+        sys.exit(-1)
+
+    if expires_in < int(time.time()):
+        sys.stderr.write("You must specify an --expires-in in the future\n")
+        sys.exit(-1)
+
+    starts_in_explicit = epoch2timefmt(starts_in)
+    expires_in_explicit = epoch2timefmt(expires_in)
+    url_expires = expires_in - int(time.time())
 
     ssh_ca_section = 'ssh-ca-' + args.authority
 
@@ -156,11 +164,11 @@ if __name__ == '__main__':
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
-        public_path, username, args.starts_in, args.expires_in, reason, principal)
+        public_path, username, starts_in_explicit, expires_in_explicit, reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'
-    print ca.upload_public_key_cert(username, cert_contents, args.url_expires)
+    print ca.upload_public_key_cert(username, cert_contents, url_expires)
 
     if delete_public_key:
         os.remove(public_path)
