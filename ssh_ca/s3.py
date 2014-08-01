@@ -60,14 +60,14 @@ class S3Authority(ssh_ca.Authority):
         k = self.ssh_bucket.new_key('keys/%s' % (username,))
         k.set_contents_from_filename(key_file, replace=True)
 
-    def upload_public_key_cert(self, username, cert_contents):
+    def upload_public_key_cert(self, username, cert_contents, expires=7200):
         k = self.ssh_bucket.new_key('certs/%s-cert.pub' % (username,))
         k.set_contents_from_string(
             cert_contents,
             headers={'Content-Type': 'text/plain'},
             replace=True,
         )
-        return k.generate_url(7200)
+        return k.generate_url(expires)
 
     def make_host_audit_log(self, serial, valid_for, ca_key_filename,
                             reason, hostnames):
@@ -80,10 +80,11 @@ class S3Authority(ssh_ca.Authority):
         }
         return self.drop_audit_blob(serial, audit_info)
 
-    def make_audit_log(self, serial, valid_for, username,
+    def make_audit_log(self, serial, valid_from, valid_for, username,
                        ca_key_filename, reason, principals):
         audit_info = {
             'username': username,
+            'valid_from': valid_from,
             'valid_for': valid_for,
             'access_key': self.s3_conn.access_key,
             'ca_key_filename': ca_key_filename,

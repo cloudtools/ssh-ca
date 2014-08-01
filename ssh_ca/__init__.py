@@ -38,7 +38,7 @@ class Authority(object):
     def increment_serial_number(self):
         pass
 
-    def make_audit_log(self, serial, valid_for, username,
+    def make_audit_log(self, serial, valid_from, valid_for, username,
                        ca_key_filename, reason, principals):
         pass
 
@@ -97,7 +97,7 @@ class Authority(object):
 
         return self.get_cert_contents(public_key_filename)
 
-    def sign_public_user_key(self, public_key_filename, username,
+    def sign_public_user_key(self, public_key_filename, username, starts_in,
                              expires_in, reason, principals):
         serial = self.increment_serial_number()
 
@@ -106,13 +106,14 @@ class Authority(object):
             '-z', str(serial),
             '-s', self.ca_key,
             '-I', username,
-            '-V', expires_in,
+            '-V', starts_in, ':', expires_in,
             '-n', ','.join(principals),
             public_key_filename]
         )
 
         self.make_audit_log(
-            serial, expires_in, username, self.ca_key, reason, principals)
+            serial, starts_in, expires_in, username, self.ca_key, reason,
+            principals)
 
         return self.get_cert_contents(public_key_filename)
 

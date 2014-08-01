@@ -74,6 +74,19 @@ if __name__ == '__main__':
         help='Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. '
              'Default: %(default)s',
     )
+    parser.add_argument('-s', '--starts-in',
+            default='+0m',
+            help='Certificate becomes active in. '
+                'A relative time like +1h. Or YYYYMMDDHHMMSS.'
+                'Default: %(default)s',
+    )
+    parser.add_argument('-x', '--url-expires',
+            default=7200,
+            type=int,
+            help='Certficate URL expires in. '
+                'Number of seconds.  Default: %(default)s',
+    )
+
     args = parser.parse_args()
 
     public_path = args.public_path
@@ -143,11 +156,11 @@ if __name__ == '__main__':
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
-        public_path, username, args.expires_in, reason, principal)
+        public_path, username, args.starts_in, args.expires_in, reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'
-    print ca.upload_public_key_cert(username, cert_contents)
+    print ca.upload_public_key_cert(username, cert_contents, args.url_expires)
 
     if delete_public_key:
         os.remove(public_path)
