@@ -77,7 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--starts-in',
             default='+0m',
             help='Certificate becomes active in. '
-                'A relative time like +1h. Or YYYYMMDDHHMMSS.'
+                'A relative time like +1h. Or YYYYMMDDHHMMSS. '
                 'Default: %(default)s',
     )
     parser.add_argument('-x', '--url-expires',
