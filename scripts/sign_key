@@ -28,7 +28,7 @@ from contextlib import closing
 
 import ssh_ca
 import ssh_ca.s3
-from ssh_ca.utils import (parse_time, epoch2timefmt)
+from ssh_ca.utils import parse_time, epoch2timefmt
 
 
 if __name__ == '__main__':
