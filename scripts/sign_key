@@ -22,6 +22,7 @@ import ConfigParser
 import os
 import sys
 import tempfile
+import time
 
 from contextlib import closing
 
@@ -87,9 +88,10 @@ if __name__ == '__main__':
     environment = args.environment
     username = args.username
 
-    starts_in = parse_time(args.starts_in)
-    expires_in = parse_time(args.expires_in)
-    if starts_in >= expires_in:
+    now = int(time.time())
+    starts_in = parse_time(args.starts_in, now)
+    expires_in = parse_time(args.expires_in, now)
+    if starts_in > expires_in:
         sys.stderr.write("You must specify an --expires-in later then the --starts-in\n")
         sys.exit(-1)
 
@@ -97,9 +99,11 @@ if __name__ == '__main__':
         sys.stderr.write("You must specify an --expires-in in the future\n")
         sys.exit(-1)
 
-    starts_in_explicit = epoch2timefmt(starts_in)
-    expires_in_explicit = epoch2timefmt(expires_in)
-    url_expires = expires_in - int(time.time())
+    # always tell S3 to expire the key when the cert expires
+    url_expires = expires_in - now
+
+    starts_in = epoch2timefmt(starts_in)
+    expires_in = epoch2timefmt(expires_in)
 
     ssh_ca_section = 'ssh-ca-' + args.authority
 
@@ -164,7 +168,8 @@ if __name__ == '__main__':
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
-        public_path, username, starts_in_explicit, expires_in_explicit, reason, principal)
+        public_path, username, starts_in, expires_in, 
+        reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'

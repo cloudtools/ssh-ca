@@ -4,7 +4,7 @@ import subprocess
 import time
 
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 class SSHCAException(Exception):
@@ -106,7 +106,7 @@ class Authority(object):
             '-z', str(serial),
             '-s', self.ca_key,
             '-I', username,
-            '-V', starts_in, ':', expires_in,
+            '-V', starts_in + ':' + expires_in,
             '-n', ','.join(principals),
             public_key_filename]
         )

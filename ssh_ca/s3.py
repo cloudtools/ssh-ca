@@ -80,12 +80,11 @@ class S3Authority(ssh_ca.Authority):
         }
         return self.drop_audit_blob(serial, audit_info)
 
-    def make_audit_log(self, serial, valid_from, valid_for, username,
+    def make_audit_log(self, serial, starts_in, expires_in, username,
                        ca_key_filename, reason, principals):
         audit_info = {
             'username': username,
-            'valid_from': valid_from,
-            'valid_for': valid_for,
+            'valid_for': starts_in + ':' + expires_in,
             'access_key': self.s3_conn.access_key,
             'ca_key_filename': ca_key_filename,
             'reason': reason,
