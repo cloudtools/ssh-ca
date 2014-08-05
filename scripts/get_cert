@@ -49,6 +49,13 @@ def move_cert_into_place(cert_path, private_key_filename):
 
 
 def re_add_identity(private_key_filename):
+    proc = subprocess.Popen(['/usr/bin/ssh-add', '-l'],
+            stdout=subprocess.PIPE)
+    cert_line = private_key_filename + ' (RSA-CERT)'
+    for line in proc.stdout.readlines():
+        if cert_line in line:
+            subprocess.call(['/usr/bin/ssh-add', '-d', private_key_filename])
+            break
     proc = subprocess.check_output(['/usr/bin/ssh-add', private_key_filename])
 
 

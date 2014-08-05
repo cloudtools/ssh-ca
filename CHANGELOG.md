@@ -1,3 +1,7 @@
+## 0.3.1 (2014-04-17)
+- remove the private key first if we already have a cert loaded prior to
+  adding it to the agent
+
 ## 0.3.0 (2014-04-07)
 - Support specifying the principals in use
 - Add functionality for signing host keys
