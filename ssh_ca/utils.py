@@ -2,6 +2,7 @@ import sys
 import time
 import unittest
 
+
 def convert_relative_time(time_string):
     """Takes a single +XXXX[smhdw] string and converts to seconds"""
     last_char = time_string[-1]
@@ -18,14 +19,15 @@ def convert_relative_time(time_string):
         seconds = (int(user_value) * 60 * 60 * 24 * 7)
     else:
         sys.stderr.write("Invalid time format: %s.  "
-                "Missing s/m/h/d/w qualifier\n" % (time_string,))
+            "Missing s/m/h/d/w qualifier\n" % (time_string,))
         sys.exit(-1)
     return seconds
+
 
 def parse_time(time_string, reference_time=int(time.time())):
     """Parses a time in YYYYMMDDHHMMSS or +XXXX[smhdw][...]
 
-    Returns epoch time.  Just like ssk-keygen, we allow complex 
+    Returns epoch time.  Just like ssk-keygen, we allow complex
     expressions like +5d7h37m for 5 days, 7 hours, 37 minutes.
 
     reference_time should be the epoch time used for calculating
@@ -46,7 +48,7 @@ def parse_time(time_string, reference_time=int(time.time())):
             else:
                 factor = c
                 seconds += convert_relative_time(
-                        "%s%s%s" % (sign, number, factor))
+                    "%s%s%s" % (sign, number, factor))
                 number = ''
                 factor = 's'
 
@@ -62,6 +64,7 @@ def parse_time(time_string, reference_time=int(time.time())):
         epoch = int(time.mktime(struct_time))
 
     return epoch
+
 
 def epoch2timefmt(epoch):
     """Converts epoch time to YYYYMMDDHHMMSS for ssh-keygen
