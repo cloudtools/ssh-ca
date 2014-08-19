@@ -17,6 +17,7 @@ import ConfigParser
 import os
 import sys
 import tempfile
+import time
 import urlparse
 import urllib
 
@@ -24,6 +25,7 @@ from contextlib import closing
 
 import ssh_ca
 import ssh_ca.s3
+from ssh_ca.utils import parse_time, epoch2timefmt
 
 def get_public_key(path_or_url):
     parsed = urlparse.urlparse(path_or_url)
@@ -86,11 +88,34 @@ if __name__ == '__main__':
         help='Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. '
              'Default: %(default)s',
     )
+    parser.add_argument('-s', '--starts-in',
+            default='+0m',
+            help='Certificate becomes active in. '
+                'A relative time like +1h. Or YYYYMMDDHHMMSS. '
+                'Default: %(default)s',
+    )
     args = parser.parse_args()
 
     public_path = args.public_path
     environment = args.environment
     username = args.username
+
+    now = int(time.time())
+    starts_in = parse_time(args.starts_in, now)
+    expires_in = parse_time(args.expires_in, now)
+    if starts_in > expires_in:
+        sys.stderr.write("You must specify an --expires-in later then the --starts-in\n")
+        sys.exit(-1)
+
+    if expires_in < int(time.time()):
+        sys.stderr.write("You must specify an --expires-in in the future\n")
+        sys.exit(-1)
+
+    # always tell S3 to expire the key when the cert expires
+    url_expires = expires_in - now
+
+    starts_in = epoch2timefmt(starts_in)
+    expires_in = epoch2timefmt(expires_in)
 
     ssh_ca_section = 'ssh-ca-' + args.authority
 
@@ -156,11 +181,12 @@ if __name__ == '__main__':
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
-        public_path, username, args.expires_in, reason, principal)
+        public_path, username, starts_in, expires_in, 
+        reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'
-    print ca.upload_public_key_cert(username, cert_contents)
+    print ca.upload_public_key_cert(username, cert_contents, url_expires)
 
     if delete_public_key:
         os.remove(public_path)
