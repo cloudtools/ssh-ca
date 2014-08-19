@@ -17,17 +17,17 @@ class SshAgentBuffer(object):
         self.parts = []
 
     def append_byte(self, byte):
-        self.parts.append(chr(byte))
+        self.parts.append(bytes([byte,]))
 
     def append_uint32(self, number):
         self.parts.append(struct.pack('>I', number))
 
     def append_string(self, string):
         self.append_uint32(len(string))
-        self.parts.append(string)
+        self.parts.append(str.encode(string, 'ascii'))
 
     def serialize(self):
-        resultant_buffer = ''.join(self.parts)
+        resultant_buffer = b''.join(self.parts)
         return struct.pack('>I', len(resultant_buffer)) + resultant_buffer
 
 
