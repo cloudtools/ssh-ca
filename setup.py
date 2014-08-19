@@ -14,4 +14,5 @@ setup(
     packages=['ssh_ca'],
     scripts=glob.glob('scripts/*'),
     use_2to3=True,
+    test_suite="tests",
 )
