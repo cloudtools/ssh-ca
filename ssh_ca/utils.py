@@ -19,7 +19,7 @@ def convert_relative_time(time_string):
         seconds = (int(user_value) * 60 * 60 * 24 * 7)
     else:
         sys.stderr.write("Invalid time format: %s.  "
-            "Missing s/m/h/d/w qualifier\n" % (time_string,))
+                         "Missing s/m/h/d/w qualifier\n" % (time_string,))
         sys.exit(-1)
     return seconds
 
