@@ -40,7 +40,7 @@ class TestAgentBuffer(unittest.TestCase):
         buf.append_string('helloWorld')
         results = buf.serialize()
 
-        self.assertIn(bytes([93,]), results)
+        self.assertIn(bytes([93]), results)
         self.assertIn(struct.pack('>I', 12394), results)
         self.assertIn(b'helloWorld', results)
 

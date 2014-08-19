@@ -17,7 +17,7 @@ class SshAgentBuffer(object):
         self.parts = []
 
     def append_byte(self, byte):
-        self.parts.append(bytes([byte,]))
+        self.parts.append(bytes([byte]))
 
     def append_uint32(self, number):
         self.parts.append(struct.pack('>I', number))
