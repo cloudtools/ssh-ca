@@ -1,3 +1,4 @@
+import base64
 import os
 import struct
 import unittest
@@ -37,12 +38,12 @@ class TestAgentBuffer(unittest.TestCase):
         buf = agent_client.SshAgentBuffer()
         buf.append_byte(93)
         buf.append_uint32(12394)
-        buf.append_string('helloWorld')
+        buf.append_bytestring(base64.b64decode('AAAA'))
         results = buf.serialize()
 
         self.assertIn(bytes([93]), results)
         self.assertIn(struct.pack('>I', 12394), results)
-        self.assertIn(b'helloWorld', results)
+        self.assertIn(b'\x00\x00\x00', results)
 
 
 if __name__ == '__main__':

@@ -22,9 +22,9 @@ class SshAgentBuffer(object):
     def append_uint32(self, number):
         self.parts.append(struct.pack('>I', number))
 
-    def append_string(self, string):
+    def append_bytestring(self, string):
         self.append_uint32(len(string))
-        self.parts.append(str.encode(string, 'ascii'))
+        self.parts.append(string)
 
     def serialize(self):
         resultant_buffer = b''.join(self.parts)
@@ -79,7 +79,7 @@ class Client(object):
     def remove_key(self, pubkey):
         remove_msg = SshAgentBuffer()
         remove_msg.append_byte(SSH_AGENTC_REMOVE_RSA_IDENTITY)
-        remove_msg.append_string(base64.b64decode(pubkey))
+        remove_msg.append_bytestring(bytes(base64.b64decode(pubkey)))
         self._send_msg(remove_msg.serialize())
         if self._recv_response_code() != SSH_AGENT_SUCCESS:
             raise SshClientFailure('Unable to remove key.')
