@@ -180,8 +180,8 @@ if __name__ == '__main__':
         principal = ['ec2-user', 'ubuntu']
 
     # Sign the key
-    ( cert_contents, serial ) = ca.sign_public_user_key(
-        public_path, username, starts_in, expires_in, 
+    (cert_contents, serial) = ca.sign_public_user_key(
+        public_path, username, starts_in, expires_in,
         reason, principal)
 
     print
