@@ -60,12 +60,13 @@ class S3Authority(ssh_ca.Authority):
         k = self.ssh_bucket.new_key('keys/%s' % (username,))
         k.set_contents_from_string(key_contents, replace=True)
 
-    def upload_public_key_cert(self, username, cert_contents, expires=7200):
-        k = self.ssh_bucket.new_key('certs/%s-cert.pub' % (username,))
+    def upload_public_key_cert(self, username, serial, cert_contents,
+            expires=7200):
+        k = self.ssh_bucket.new_key('certs/%s-%s-cert.pub' % (username, serial))
         k.set_contents_from_string(
             cert_contents,
             headers={'Content-Type': 'text/plain'},
-            replace=True,
+            replace=False,
         )
         return k.generate_url(expires)
 
