@@ -180,13 +180,14 @@ if __name__ == '__main__':
         principal = ['ec2-user', 'ubuntu']
 
     # Sign the key
-    (cert_contents, serial) = ca.sign_public_user_key(
+    cert_contents = ca.sign_public_user_key(
         public_path, username, starts_in, expires_in,
         reason, principal)
 
     print
     print 'Public key signed, certificate available for download here:'
-    print ca.upload_public_key_cert(username, serial, cert_contents, url_expires)
+    print ca.upload_public_key_cert(username, environment, cert_contents,
+            url_expires)
 
     if delete_public_key:
         os.remove(public_path)

@@ -115,7 +115,7 @@ class Authority(object):
             serial, starts_in, expires_in, username, self.ca_key, reason,
             principals)
 
-        return [self.get_cert_contents(public_key_filename), serial]
+        return self.get_cert_contents(public_key_filename)
 
     def get_cert_contents(self, public_key_filename):
         if public_key_filename.endswith('.pub'):
