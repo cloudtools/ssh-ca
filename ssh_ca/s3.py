@@ -66,7 +66,7 @@ class S3Authority(ssh_ca.Authority):
         k.set_contents_from_string(
             cert_contents,
             headers={'Content-Type': 'text/plain'},
-            replace=False,
+            replace=True,
         )
         return k.generate_url(expires)
 
