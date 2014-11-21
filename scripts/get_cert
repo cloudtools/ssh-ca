@@ -34,7 +34,8 @@ def get_cert_metadata(cert_path):
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if proc.stderr.read().find('is not a public key'):
-        print "Unable to download cert from AWS.  Maybe cert has expired?"
+        print "Error processing signed cert from AWS:"
+        print open(cert_path).read()
         sys.exit(1)
 
     metadata = CertMetadata()
