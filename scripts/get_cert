@@ -31,7 +31,12 @@ def download_cert_to_tempfile(url):
 
 def get_cert_metadata(cert_path):
     proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-L', '-f', cert_path],
-        stdout=subprocess.PIPE)
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    if proc.stderr.read().find('is not a public key'):
+        print "Unable to download cert from AWS.  Maybe cert has expired?"
+        sys.exit(1)
+
     metadata = CertMetadata()
     for line in proc.stdout.readlines():
         if 'Public key:' in line:
@@ -40,7 +45,8 @@ def get_cert_metadata(cert_path):
             metadata.public_key_fingerprint = fingerprint
         if 'Valid:' in line:
             expire_time = line[line.find(' to ') + 4:].strip()
-            expire_dt = datetime.datetime.strptime(expire_time, '%Y-%m-%dT%H:%M:%S')
+            expire_dt = datetime.datetime.strptime(expire_time,
+                                                   '%Y-%m-%dT%H:%M:%S')
             now_dt = datetime.datetime.now()
             delta = expire_dt - now_dt
             valid_for_seconds = delta.seconds
@@ -84,7 +90,8 @@ def re_add_identity(private_key_filename, valid_for_seconds):
             print 'Unable to delete existing key, this is probably benign'
 
     proc = subprocess.check_output([
-        '/usr/bin/ssh-add', '-t', '%d' % (valid_for_seconds,), private_key_filename])
+        '/usr/bin/ssh-add', '-t', '%d' % (valid_for_seconds,),
+        private_key_filename])
 
 
 if __name__ == '__main__':
@@ -102,4 +109,3 @@ if __name__ == '__main__':
 
     move_cert_into_place(cert_filename, private_key_filename)
     re_add_identity(private_key_filename, cert_metadata.valid_for_seconds)
-
