@@ -27,6 +27,7 @@ import ssh_ca
 import ssh_ca.s3
 from ssh_ca.utils import parse_time, epoch2timefmt
 
+
 def get_public_key(path_or_url):
     parsed = urlparse.urlparse(path_or_url)
     fd = None
@@ -104,7 +105,8 @@ if __name__ == '__main__':
     starts_in = parse_time(args.starts_in, now)
     expires_in = parse_time(args.expires_in, now)
     if starts_in > expires_in:
-        sys.stderr.write("You must specify an --expires-in later then the --starts-in\n")
+        sys.stderr.write("You must specify an --expires-in later then "
+                         "the --starts-in\n")
         sys.exit(-1)
 
     if expires_in < int(time.time()):
@@ -113,6 +115,13 @@ if __name__ == '__main__':
 
     # always tell S3 to expire the key when the cert expires
     url_expires = expires_in - now
+
+    # Keys which expire really soon don't make much sense
+    if url_expires < (5 * 60):
+        sys.stderr.write("*" * 50 + "\n")
+        sys.stderr.write("WARNING: Very short cert expire time of %dsec!\n" %
+                         (url_expires,))
+        sys.stderr.write("*" * 50 + "\n")
 
     starts_in = epoch2timefmt(starts_in)
     expires_in = epoch2timefmt(expires_in)
