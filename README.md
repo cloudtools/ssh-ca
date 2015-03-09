@@ -49,7 +49,7 @@ Generate a certificate using the utility in this github repo:
 
 Install the certificate using the other utility in this github repo:
 
-`get_key '<output from sign_key command>'`
+`get_cert '<output from sign_key command>'`
 
 SSH like normal.
 
