@@ -22,7 +22,8 @@ certificate. The admin needs to take this URL and download the file it points
 at. The downloaded file should be named exactly like their host SSH key but
 with the suffix "-cert.pub".
 
-For example, if the host key is /etc/ssh/ssh_host_rsa_key.pub do something like:
+For example, if the host key is /etc/ssh/ssh_host_rsa_key.pub do something
+like:
 
     curl <THE URL> > /etc/ssh/ssh_host_rsa_key-cert.pub
 
@@ -53,27 +54,22 @@ if __name__ == '__main__':
         os.getenv('SSH_CA_CONFIG', '~/.ssh_ca/config'))
 
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument('-a', '--authority',
-        dest='authority', default=default_authority,
-        help='Pick one: s3',
-    )
-    parser.add_argument('-c', '--config-file',
-        default=default_config,
+    parser.add_argument(
+        '-a', '--authority', dest='authority', default=default_authority,
+        help='Pick one: s3')
+    parser.add_argument(
+        '-c', '--config-file', default=default_config,
         help='The configuration file to use.  Can also be '
              'specified in the SSH_CA_CONFIG environment '
-             'variable.  Default: %(default)s',
-    )
-    parser.add_argument('-e', '--environment',
-        required=True,
-        help='Environment name',
-    )
-    parser.add_argument('--hostname',
-        action='append', required=True, dest='hostnames',
+             'variable.  Default: %(default)s')
+    parser.add_argument(
+        '-e', '--environment', required=True, help='Environment name')
+    parser.add_argument(
+        '--hostname', action='append', required=True, dest='hostnames',
         help='A principal (hostname) that clients can verify. '
-        'This should match what the user types for "ssh <hostname>',
-    )
-    parser.add_argument('-t', '--expires-in',
-        default='+104w',
+             'This should match what the user types for "ssh <hostname>')
+    parser.add_argument(
+        '-t', '--expires-in', default='+104w',
         help='Expires in. A relative time like +1w. Or YYYYMMDDHHMMSS. '
              'Default: %(default)s',
     )

@@ -66,8 +66,9 @@ def find_private_key_for_public_key(pub_fingerprint):
         key_filename = ssh_dir + '/' + filename
         if key_filename.endswith('pub'):
             continue
-        proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f',
-            key_filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(
+            ['/usr/bin/ssh-keygen', '-l', '-f', key_filename],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         for line in proc.stdout.readlines():
             if pub_fingerprint in line:
                 return key_filename
@@ -84,7 +85,7 @@ def re_add_identity(private_key_filename, valid_for_seconds):
         agent_client = ssh_ca.agent_client.Client()
         try:
             agent_client.connect()
-        except ssh_ca.agent_client.SshClientFailure, e:
+        except ssh_ca.agent_client.SshClientFailure:
             print "Unable to find SSH agent, things probably aren't working."
 
         with open(public_filename, 'r') as f:
@@ -94,7 +95,7 @@ def re_add_identity(private_key_filename, valid_for_seconds):
         except ssh_ca.agent_client.SshClientFailure:
             print 'Unable to delete existing key, this is probably benign'
 
-    proc = subprocess.check_output([
+    subprocess.check_output([
         '/usr/bin/ssh-add', '-t', '%d' % (valid_for_seconds,),
         private_key_filename])
 
