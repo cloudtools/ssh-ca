@@ -187,12 +187,10 @@ if __name__ == '__main__':
         principals = args.principal
     else:
         p_conf = ssh_ca.get_config_value(config, environment, 'principals')
-        print "Found principals in config: %s" % p_conf
         if p_conf:
             principals = [p.strip() for p in p_conf.split(',')]
         else:
             principals = ['ec2-user', 'ubuntu']
-        print "Principals: %s" % principals
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
