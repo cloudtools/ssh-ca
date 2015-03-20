@@ -184,14 +184,18 @@ if __name__ == '__main__':
             sys.exit(1)
 
     if args.principal:
-        principal = args.principal
+        principals = args.principal
     else:
-        principal = ['ec2-user', 'ubuntu']
+        p_conf = ssh_ca.get_config_value(config, environment, 'principals')
+        if p_conf:
+            principals = [p.strip() for p in p_conf.split(',')]
+        else:
+            principals = ['ec2-user', 'ubuntu']
 
     # Sign the key
     cert_contents = ca.sign_public_user_key(
         public_path, username, starts_in, expires_in,
-        reason, principal)
+        reason, principals)
 
     print
     print 'Public key signed, certificate available for download here:'
