@@ -1,3 +1,10 @@
+## 0.3.2 (2015-03-20)
+- Work around re-adding cert bug on osx
+- allow http/https in public key path
+- issuing future certificates
+- can override default 2 hour window for cert downloads from S3
+- definition of principals per environment in config
+
 ## 0.3.1 (2014-04-17)
 - remove the private key first if we already have a cert loaded prior to
   adding it to the agent
