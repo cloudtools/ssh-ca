@@ -27,6 +27,8 @@ import ssh_ca
 import ssh_ca.s3
 from ssh_ca.utils import parse_time, epoch2timefmt
 
+from boto.exception import NoAuthHandlerFound
+
 
 def get_public_key(path_or_url):
     parsed = urlparse.urlparse(path_or_url)
@@ -137,6 +139,10 @@ if __name__ == '__main__':
         ca = ssh_ca.s3.S3Authority(config, ssh_ca_section, ca_key)
     except ssh_ca.SSHCAInvalidConfiguration, e:
         print 'Issue with creating CA: %s' % e.message
+        sys.exit(1)
+    except NoAuthHandlerFound:
+        print ("Error: No AWS credentials found- check your environment for "
+               "the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY variables.")
         sys.exit(1)
 
     if args.upload_only:
