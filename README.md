@@ -1,3 +1,11 @@
+Deprecation notice
+==================
+
+This project is now deprecated in favor of a more comprehensive tool:
+
+https://github.com/cloudtools/ssh-cert-authority
+
+
 Certificate based SSH
 =====================
 
