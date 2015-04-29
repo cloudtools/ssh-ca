@@ -1,7 +1,7 @@
-Deprecation notice
-==================
+New Project Announcement
+========================
 
-This project is now deprecated in favor of a more comprehensive tool:
+We figured out how to make this service a bit more self-service and arguably more secure. That project is here:
 
 https://github.com/cloudtools/ssh-cert-authority
 
