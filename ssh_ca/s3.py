@@ -25,6 +25,7 @@ class S3Authority(ssh_ca.Authority):
         except S3ResponseError, e:
             if e.code == "AccessDenied":
                 raise ssh_ca.SSHCAInvalidConfiguration("Access denied to S3")
+            raise
 
     def increment_serial_number(self):
         k = self.ssh_bucket.get_key('serial')
