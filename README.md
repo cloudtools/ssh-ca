@@ -1,3 +1,12 @@
+New Project Announcement
+========================
+
+We figured out how to make this service a bit more self-service and arguably more secure. That project is here:
+
+https://github.com/cloudtools/ssh-cert-authority
+
+The authors of ssh-ca suggest that for the latest and greatest in updates and support you use the ssh-cert-authority tool. It's worth switching.
+
 Certificate based SSH
 =====================
 
